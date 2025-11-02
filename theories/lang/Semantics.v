@@ -1,4 +1,5 @@
-Require Import BSyntax Tactics.
+From Books Require Import Tactics.
+From Books.lang Require Import Syntax.
 From Stdlib Require Import List.
 Import ListNotations.
 Open Scope N_scope.

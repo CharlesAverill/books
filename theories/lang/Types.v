@@ -1,4 +1,4 @@
-Require Import BSyntax.
+From Books.lang Require Import Syntax.
 
 Inductive btype : Set :=
   | TNat

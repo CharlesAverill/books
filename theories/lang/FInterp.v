@@ -1,4 +1,5 @@
-Require Import BSyntax Semantics BRelations Tactics.
+From Books.lang Require Import Syntax Semantics.
+From Books Require Import BRelations Tactics.
 
 Fixpoint faeval (s : store) (a : Aexpr) : option N :=
   match a with
@@ -97,13 +98,13 @@ Proof.
   - constructor.
   - constructor. destruct (s i); inv H1. destruct s0; now inv H0.
   - destruct (faeval s a1) eqn:E0, (faeval s a2) eqn:E1; try discriminate.
-    inv H1. econstructor; eauto. exact I.
+    inv H1. econstructor; eauto. now left.
   - destruct (faeval s a1) eqn:E0, (faeval s a2) eqn:E1; try discriminate.
-    inv H1. econstructor; eauto. exact I.
+    inv H1. econstructor; eauto. right. now left.
   - destruct (faeval s a1) eqn:E0, (faeval s a2) eqn:E1; try discriminate.
-    inv H1. econstructor; eauto. exact I.
+    inv H1. econstructor; eauto. right. right. now left.
   - destruct (faeval s a1) eqn:E0, (faeval s a2) eqn:E1; try discriminate.
-    inv H1. econstructor; eauto. exact I.
+    inv H1. econstructor; eauto. right. right. right. now left.
 Qed.
 
 Lemma fbeval_sound :
@@ -114,11 +115,11 @@ Proof.
   induction b; intros; simpl in H; inv H.
   - constructor.
   - constructor. destruct (s i); inv H1. destruct s0; now inv H0.
-  - destruct (fbeval s b) eqn:E; try discriminate. inv H1. econstructor; eauto. exact I.
+  - destruct (fbeval s b) eqn:E; try discriminate. inv H1. econstructor; eauto. now left.
   - destruct (fbeval s b1) eqn:E0, (fbeval s b2) eqn:E1; try discriminate.
-    inv H1. eapply EBBop; eauto. exact I.
+    inv H1. eapply EBBop; eauto. now left.
   - destruct (fbeval s b1) eqn:E0, (fbeval s b2) eqn:E1; try discriminate.
-    inv H1. eapply EBBop; eauto. exact I.
+    inv H1. eapply EBBop; eauto. right. now left.
 Qed.
 
 Theorem fstep_sound :
@@ -199,3 +200,5 @@ Proof.
     simpl. apply fbeval_complete in H. now rewrite H.
   - (* While *) reflexivity.
 Qed.
+
+End FInterpCorrectness.
