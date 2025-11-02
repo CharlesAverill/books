@@ -1,2 +1,2 @@
--Q theories PROJECT
-theories/Test.v
+-R theories Books
+theories/
