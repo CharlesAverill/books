@@ -1,5 +1,5 @@
 From Books.lang Require Import Syntax Semantics.
-From Books Require Import BRelations Tactics.
+From Books Require Import Tactics.
 
 Fixpoint faeval (s : store) (a : Aexpr) : option N :=
   match a with
