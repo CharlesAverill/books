@@ -1,5 +1,5 @@
 From Books Require Import compiler.Layout.
-From Books Require Import lang.Syntax vm.Syntax vm.FInterp vm.Semantics.
+From Books Require Import lang.Syntax vm.Syntax.
 From Stdlib Require Import List.
 Import ListNotations.
 
@@ -42,20 +42,14 @@ Definition MULT (pc : N) : list instr :=
     Pop; Swap; Pop; Swap; Pop
   ].
 
-Fixpoint AEVAL (pc : pc) (l : var_layout) (a : Aexpr) : list instr :=
-  match a with
-  | ConstNat n => [Const n]
-  | VarNat i => LOAD l i
-  | lang.Syntax.Plus a1 a2 =>
-      let l1 := AEVAL pc l a1 in
-      let l2 := AEVAL (pc + N.of_nat (length l1)) l a2
-      in l1 ++ l2 ++ [Plus]
-  | lang.Syntax.Minus a1 a2 =>
-      let l1 := AEVAL pc l a1 in
-      let l2 := AEVAL (pc + N.of_nat (length l1)) l a2
-      in l1 ++ l2 ++ [Minus]
-  | lang.Syntax.Mult a1 a2 =>
-      let l1 := AEVAL pc l a1 in
-      let l2 := AEVAL (pc + N.of_nat (length l1)) l a2
-      in l1 ++ l2 ++ MULT (pc + N.of_nat (length l1) + N.of_nat (length l2))
-  end.
+Definition NEG (pc : N) : list instr :=
+  [ Jnz (pc + 4); Pop; Const 1; Jmp (pc + 6); Pop; Const 0 ].
+
+Definition OR (pc : N) : list instr :=
+  [ Jnz (pc + 6); Pop; Jnz (pc + 7); Pop; Const 0; Jmp (pc + 9); Pop; Pop; Const 1 ].
+
+Definition AND (pc : N) : list instr :=
+  [ Jnz (pc + 5); Pop; Pop; Const 0; Jmp (pc + 11);
+    Pop; Jnz (pc + 9); Pop; Const 0; Jmp (pc + 11);
+    Pop; Pop; Const 1
+  ].
