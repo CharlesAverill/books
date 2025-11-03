@@ -10,7 +10,6 @@ Definition _compute_arith_bop op : option N :=
   | Plus (ConstNat n1) (ConstNat n2) => Some (n1 + n2)
   | Minus (ConstNat n1) (ConstNat n2) => Some (n1 - n2)
   | Mult (ConstNat n1) (ConstNat n2) => Some (n1 * n2)
-  | Div (ConstNat n1) (ConstNat n2) => Some (n1 / n2)
   | _ => None
   end.
 
@@ -21,7 +20,7 @@ Inductive aeval : store -> Aexpr -> N -> Prop :=
       s i = Some (Nat v) ->
       aeval s (VarNat i) v
   | EABop s op a1 a2 n1 n2 v :
-      In op [Plus; Minus; Mult; Div] -> aeval s a1 n1 -> aeval s a2 n2 ->
+      In op [Plus; Minus; Mult] -> aeval s a1 n1 -> aeval s a2 n2 ->
       _compute_arith_bop (op (ConstNat n1) (ConstNat n2)) = Some v ->
       aeval s (op a1 a2) v.
 
@@ -96,10 +95,6 @@ Proof.
       enough (n1 = n0 /\ n2 = n3). destruct H; now subst. auto.
   - (* Mult *) inv H. inv H0.
       replace op with Mult in * by solve_in. replace op0 with Mult in * by solve_in.
-      inv H1. inv H. simpl in H6, H10. inv H6. inv H10.
-      enough (n1 = n0 /\ n2 = n3). destruct H; now subst. auto.
-  - (* Div *) inv H. inv H0.
-      replace op with Div in * by solve_in. replace op0 with Div in * by solve_in.
       inv H1. inv H. simpl in H6, H10. inv H6. inv H10.
       enough (n1 = n0 /\ n2 = n3). destruct H; now subst. auto.
 Qed.

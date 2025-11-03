@@ -9,8 +9,7 @@ Inductive Aexpr :=
   | VarNat (i : ident)
   | Plus (e1 e2 : Aexpr)
   | Minus (e1 e2 : Aexpr)
-  | Mult (e1 e2 : Aexpr)
-  | Div (e1 e2 : Aexpr).
+  | Mult (e1 e2 : Aexpr).
 
 Inductive Bexpr :=
   | ConstBool (b : bool)

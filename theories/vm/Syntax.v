@@ -8,6 +8,11 @@ Inductive instr : Type :=
   | Const (n : N)
   | Pop
   | Plus
+  | Minus
+  | Top
+  | Dup
+  | Swap
+  | Store
   | Jmp (pos : pc)
   | Jnz (pos : pc).
 

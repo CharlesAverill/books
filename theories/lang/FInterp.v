@@ -24,11 +24,6 @@ Fixpoint faeval (s : store) (a : Aexpr) : option N :=
       | Some n1, Some n2 => Some (n1 * n2)
       | _, _ => None
       end
-  | Div a1 a2 => 
-      match faeval s a1, faeval s a2 with
-      | Some n1, Some n2 => Some (n1 / n2)
-      | _, _ => None
-      end
   end.
 
 Fixpoint fbeval (s : store) (b : Bexpr) : option bool :=
@@ -103,8 +98,6 @@ Proof.
     inv H1. econstructor; eauto. right. now left.
   - destruct (faeval s a1) eqn:E0, (faeval s a2) eqn:E1; try discriminate.
     inv H1. econstructor; eauto. right. right. now left.
-  - destruct (faeval s a1) eqn:E0, (faeval s a2) eqn:E1; try discriminate.
-    inv H1. econstructor; eauto. right. right. right. now left.
 Qed.
 
 Lemma fbeval_sound :
@@ -162,8 +155,7 @@ Proof.
   - simpl. now rewrite H.
   - inv H; simpl in *; [now rewrite IHaeval1, IHaeval2|].
     inv H3; simpl in *; [now rewrite IHaeval1, IHaeval2|].
-    inv H; simpl in *; [now rewrite IHaeval1, IHaeval2|].
-    inv H3; simpl in *; [now rewrite IHaeval1, IHaeval2|]. inv H.
+    inv H; simpl in *; [now rewrite IHaeval1, IHaeval2|]. inv H3.
 Qed.
 
 Lemma fbeval_complete :
