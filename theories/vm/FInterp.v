@@ -24,7 +24,7 @@ Definition fstep (p : program) (st : stack) (pcnt : pc) : option (stack * pc) :=
   | Some Dup =>
       match st with
       | idx :: st' =>
-          match nth_error st' (length st' - N.to_nat idx) with
+          match nth_error st' (length st' - N.to_nat idx - 1) with
           | Some n => Some (n :: st', pcnt + 1)
           | _ => None
           end
@@ -37,7 +37,7 @@ Definition fstep (p : program) (st : stack) (pcnt : pc) : option (stack * pc) :=
       end
   | Some Store =>
       match st with
-      | n :: idx :: t => Some (list_update t (N.of_nat (length t) - idx) n, pcnt + 1)
+      | n :: idx :: t => Some (list_update 0 t (N.of_nat (length t) - idx) n, pcnt + 1)
       | _ => None
       end
   | Some Top => Some (N.of_nat (length st) :: st, pcnt + 1)
@@ -82,7 +82,7 @@ Proof.
   - (* Minus *) destruct st; inv H1; destruct st; inv H0; now constructor.
   - (* Top *) now constructor.
   - (* Dup *) destruct st as [|idx st]; inv H1.
-      destruct (nth_error st (length st - N.to_nat idx)) eqn:E; inv H0; eauto.
+      destruct (nth_error st (length st - N.to_nat idx - 1)) eqn:E; inv H0; eauto.
   - (* Swap *) destruct st; inv H1; destruct st; inv H0; now constructor.
   - (* Store *) destruct st; inv H1; destruct st; inv H0; now constructor.
   - (* Jmp *) now constructor.

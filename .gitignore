@@ -3,3 +3,4 @@
 Makefile.conf
 *.aux
 *.glob
+.lia.cache

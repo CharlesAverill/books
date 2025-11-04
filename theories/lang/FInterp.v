@@ -63,12 +63,12 @@ Fixpoint fstep (s : store) (st : stmt) : option (store * stmt) :=
       match e with
       | AE a =>
           match faeval s a with
-          | Some n => Some (update s v (Some (Nat n)), Skip)
+          | Some n => Some (update ieqb s v (Some (Nat n)), Skip)
           | _ => None
           end
       | BE b =>
           match fbeval s b with
-          | Some n => Some (update s v (Some (Bool n)), Skip)
+          | Some n => Some (update ieqb s v (Some (Bool n)), Skip)
           | _ => None
           end
       end

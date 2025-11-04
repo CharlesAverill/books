@@ -1,11 +1,11 @@
-From Books Require Import compiler.Routines compiler.Layout.
+From Books Require Export compiler.Routines compiler.Layout.
 From Books Require Import lang.Syntax vm.Syntax vm.FInterp.
 From Stdlib Require Import List.
 Import ListNotations.
 
 Definition LN {X : Type} := fun (x : list X) => N.of_nat (List.length x).
 
-Fixpoint AEVAL (pc : pc) (l : var_layout) (a : Aexpr) : list instr :=
+Fixpoint AEVAL (pc : pc) (l : layout) (a : Aexpr) : list instr :=
   match a with
   | ConstNat n => [Const n]
   | VarNat i => LOAD l i
@@ -23,7 +23,7 @@ Fixpoint AEVAL (pc : pc) (l : var_layout) (a : Aexpr) : list instr :=
       in l1 ++ l2 ++ MULT (pc + LN l1 + LN l2)
   end.
 
-Fixpoint BEVAL (pc : pc) (l : var_layout) (b : Bexpr) : list instr :=
+Fixpoint BEVAL (pc : pc) (l : layout) (b : Bexpr) : list instr :=
   match b with
   | ConstBool b => [Const (if b then 1 else 0)]
   | VarBool i => LOAD l i
@@ -40,12 +40,16 @@ Fixpoint BEVAL (pc : pc) (l : var_layout) (b : Bexpr) : list instr :=
       in l1 ++ l2 ++ AND (pc + LN l1 + LN l2)
   end.
 
-Fixpoint CEVAL (pc : pc) (l : var_layout) (c : stmt) : list instr :=
+Fixpoint CEVAL (pc : pc) (l : layout) (c : stmt) : list instr :=
   match c with
   | Skip => []
   | Assign i e =>
-      let le := match e with AE e => AEVAL pc l e | BE e => BEVAL pc l e end in
-      le ++ SETN_fromstack (l i)
+      match l i with
+      | None => []
+      | Some x =>
+          let le := match e with AE e => AEVAL pc l e | BE e => BEVAL pc l e end in
+          le ++ SETN_fromstack x
+      end
   | Seq c1 c2 =>
       let lc1 := CEVAL pc l c1 in
       let lc2 := CEVAL (pc + LN lc1) l c2 in
@@ -54,9 +58,9 @@ Fixpoint CEVAL (pc : pc) (l : var_layout) (c : stmt) : list instr :=
       let lb := BEVAL pc l (Neg b) in
       let lc1 := CEVAL (pc + LN lb) l c1 in
       let lc2 := CEVAL (pc + LN lb + LN lc1) l c2 in
-      lb ++ [Jnz (pc + LN lb + 1 + LN lc1 + 1)]
+      lb ++ [Jnz (pc + LN lb + 2 + LN lc1 + 1); Pop]
          ++ lc1
-         ++ [Jmp (pc + LN lb + 1 + LN lc1 + 1 + LN lc2)]
+         ++ [Jmp (pc + LN lb + 2 + LN lc1 + 2 + LN lc2); Pop]
          ++ lc2
   | While b cbody =>
       let lb := BEVAL pc l b in
@@ -66,9 +70,10 @@ Fixpoint CEVAL (pc : pc) (l : var_layout) (c : stmt) : list instr :=
          ++ [Jmp pc]
   end.
 
-Require Import String.
+From Stdlib Require Import String.
 Open Scope string.
-Definition plist := CEVAL 0 (fun _ => 0) (IfThenElse (ConstBool true) (Assign "hello" (AE (ConstNat 99))) Skip).
-Definition prog := program_of_plist plist.
+Definition plist := CEVAL 0 (layout_of_alist [("hello", 0)]) (IfThenElse (ConstBool true) (Assign "hello" (AE (ConstNat 99))) Skip).
+Definition prog := program_of_plist 0 plist.
 
-Compute fmultistep prog [] 0 (LN plist) 30.
+Compute plist.
+Compute fmultistep prog [0] 0 (LN plist) 100.

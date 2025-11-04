@@ -1,5 +1,5 @@
 From Books Require Import Tactics.
-From Books.lang Require Import Syntax.
+From Books.lang Require Export Syntax.
 From Stdlib Require Import List.
 Import ListNotations.
 Open Scope N_scope.
@@ -59,7 +59,7 @@ Inductive step : store -> stmt -> store -> stmt -> Prop :=
       step s (Seq Skip c) s c
   | SAssign i e v s :
       eeval s e v ->
-      step s (Assign i e) (update s i (Some v)) Skip
+      step s (Assign i e) (update ieqb s i (Some v)) Skip
   | SIfTrue s b c1 c2 :
       beval s b true ->
       step s (IfThenElse b c1 c2) s c1
@@ -70,12 +70,6 @@ Inductive step : store -> stmt -> store -> stmt -> Prop :=
       step s (While b c) s (IfThenElse b (Seq c (While b c)) Skip).
 
 Hint Constructors step : core.
-
-Ltac solve_in :=
-  repeat match goal with
-  | [H: In _ [] |- _ ] => inv H
-  | [H: In ?op _ |- _] => inv H; [easy|]
-  end.
 
 Lemma aeval_deterministic :
   forall s a v1 v2,

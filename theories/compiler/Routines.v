@@ -3,7 +3,8 @@ From Books Require Import lang.Syntax vm.Syntax.
 From Stdlib Require Import List.
 Import ListNotations.
 
-Definition LOAD (l : var_layout) (i : ident) : list instr := [Const (l i); Dup].
+Definition LOAD (l : layout) (i : ident) : list instr := 
+  match l i with None => [] | Some x => [Const x; Dup] end.
 
 Definition GETN (n : N) : list instr :=
   [ Top; Const n; Minus; Dup ].

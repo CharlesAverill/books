@@ -23,10 +23,10 @@ Defined.
 Definition program : Type := pc -> option instr.
 
 Definition plist : Type := list instr.
-Definition program_of_plist (pl : plist) : program :=
+Definition program_of_plist (base_pc : pc) (pl : plist) : program :=
   snd (fold_left (
     fun a i =>
       match a with
       | (pc, prog) => (pc + 1, fun pc' => if pc' =? pc then Some i else prog pc')
       end
-  ) pl (0, (fun _ => None))).
+  ) pl (base_pc, (fun _ => None))).

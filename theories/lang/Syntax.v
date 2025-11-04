@@ -26,7 +26,9 @@ Inductive storeval : Type := Nat (n : N) | Bool (b : bool).
 
 Definition store : Type := ident -> option storeval.
 
-Definition update (s : store) k v := fun k' => if ieqb k k' then v else s k'.
+Definition update {A B : Type} (eqb : A -> A -> bool) (s : A -> B) (k : A) (v : B) :=
+  fun k' => if eqb k k' then v else s k'.
+Definition supdate : store -> ident -> option storeval -> store := update ieqb.
 
 Inductive stmt : Type :=
   | Skip
